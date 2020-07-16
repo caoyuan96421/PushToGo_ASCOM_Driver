@@ -85,7 +85,7 @@ namespace ASCOM.PushToGo
                         //TelescopeHardware.CanFindHome = setupForm.CanFindHome;
                         //TelescopeHardware.CanPark = setupForm.CanPark;
                         //TelescopeHardware.NumberMoveAxis = setupForm.NumberMoveAxis;
-                        //TelescopeHardware.OnTop = setupForm.OnTop;
+                        TelescopeHardware.OnTop = setupForm.OnTop;
                         //TelescopeHardware.CanPulseGuide = setupForm.CanPulseGuide;
                         //TelescopeHardware.CanSetEquatorialRates = setupForm.CanSetEquatorialRates;
                         //TelescopeHardware.CanSetGuideRates = setupForm.CanSetGuideRates;

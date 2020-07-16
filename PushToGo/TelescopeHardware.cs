@@ -785,7 +785,7 @@ namespace ASCOM.PushToGo
             set
             {
                 onTop = value;
-                s_Profile.WriteValue(SharedResources.PROGRAM_ID, "OnTop", value.ToString(), "");
+                s_Profile.WriteValue(SharedResources.PROGRAM_ID, "AlwaysOnTop", value.ToString(), "");
             }
         }
 

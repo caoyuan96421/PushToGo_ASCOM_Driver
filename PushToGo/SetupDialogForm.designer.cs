@@ -928,6 +928,7 @@ namespace ASCOM.PushToGo
             this.checkBoxOnTop.TabIndex = 16;
             this.checkBoxOnTop.Text = "Always On Top";
             this.checkBoxOnTop.UseVisualStyleBackColor = true;
+            this.checkBoxOnTop.CheckedChanged += new System.EventHandler(this.checkBoxOnTop_CheckedChanged);
             // 
             // checkBoxRefraction
             // 

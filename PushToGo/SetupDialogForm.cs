@@ -581,6 +581,11 @@ namespace ASCOM.PushToGo
         {
 
         }
+
+        private void checkBoxOnTop_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 
     [ComVisible(false)]
