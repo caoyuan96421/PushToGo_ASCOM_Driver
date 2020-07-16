@@ -52,8 +52,8 @@ namespace ASCOM.PushToGo
 
         const string SlewToHA = "SlewToHA"; const string SlewToHAUpper = "SLEWTOHA";
         const string AssemblyVersionNumber = "AssemblyVersionNumber"; const string AssemblyVersionNumberUpper = "ASSEMBLYVERSIONNUMBER";
-        //const string TimeUntilPointingStateCanChange = "TIMEUNTILPOINTINGSTATECANCHANGE";
-        //const string AvailableTimeInThisPointingState = "AVAILABLETIMEINTHISPOINTINGSTATE";
+        const string TimeUntilPointingStateCanChange = "TIMEUNTILPOINTINGSTATECANCHANGE";
+        const string AvailableTimeInThisPointingState = "AVAILABLETIMEINTHISPOINTINGSTATE";
 
         //
         // Constructor - Must be public for COM registration!
