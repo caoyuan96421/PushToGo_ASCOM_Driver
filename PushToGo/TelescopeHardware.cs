@@ -573,6 +573,13 @@ namespace ASCOM.PushToGo
                 System.Windows.Forms.MessageBox.Show("Telescope HardwareInitialise: " + ex.ToString());
             }
 
+            // Attempt to connect
+            try
+            {
+                SharedResources.Connected = true;
+                PushToGo.m_MainForm.buttonConnect.Text = "Disconn";
+            }
+            catch {}
 
             lastUpdateTime = DateTime.Now;
             Update();
@@ -633,119 +640,128 @@ namespace ASCOM.PushToGo
         /// </summary>
         private static void Update()
         {
-            // get the time since the last update. This avoids problems with the timer interval varying and greatly improves tracking.
-            var now = DateTime.Now;
-            lastUpdateTime = now;
-
-            if (!SharedResources.Connected)
+            try
             {
-                Altitude = 0;
-                Azimuth = 0;
-                RightAscension = 0;
-                Declination = 0;
-                UpdateDisplay();
-                return;
-            }
+                // get the time since the last update. This avoids problems with the timer interval varying and greatly improves tracking.
+                var now = DateTime.Now;
+                lastUpdateTime = now;
 
-            // Update positions
-            getPointingEq(out double ra, out double dec);
-            RightAscension = ra;
-            Declination = dec;
-
-            using (var trans = new Astrometry.Transform.Transform()) using (var utilities = new Util())
-            {
-                var jd = utilities.DateUTCToJulian(DateTime.UtcNow);
-                trans.SiteLatitude = Latitude;
-                trans.SiteLongitude = Longitude;
-                trans.SiteElevation = Elevation;
-                trans.SiteTemperature = temperature;
-                trans.JulianDateUTC = jd;
-                trans.SetJ2000(ra, dec);
-                trans.Refraction = Refraction;
-                trans.Refresh();
-                Altitude = trans.ElevationTopocentric;
-                Azimuth = trans.AzimuthTopocentric;
-            }
-
-            pointingState = (SideOfPier == PierSide.pierEast) ? PointingState.Normal : PointingState.ThroughThePole;
-
-            // Update Rates
-            if(Double.TryParse(CommandString("speed slew",false), out double sr))
-            {
-                slewRate = sr;
-            }
-            if (Double.TryParse(CommandString("speed track", false), out double tr))
-            {
-                trackRate = DriveRates.driveSidereal;
-                if (Math.Abs(tr - 0.9763) <= 1e-4)
+                if (!SharedResources.Connected)
                 {
-                    trackRate = DriveRates.driveLunar;
+                    Altitude = 0;
+                    Azimuth = 0;
+                    RightAscension = 0;
+                    Declination = 0;
+                    UpdateDisplay();
+                    return;
                 }
-                else if (Math.Abs(tr - 0.9973) <= 1e-4)
-                {
-                    trackRate = DriveRates.driveSolar;
-                }
-                else if (Math.Abs(tr - 0.9998) <= 1e-4)
-                {
-                    trackRate = DriveRates.driveKing;
-                }
-            }
-            if (Double.TryParse(CommandString("speed guide", false), out double gr))
-            {
-                guideRate = gr;
-            }
 
-            // Update status
-            string status = CommandString("status", false);
-            IsSlewing = status.Contains("slewing");
-            isPulseGuiding = status.Contains("guiding");
-            if (!IsSlewing) {
-                // TODO South semisphere support
-                trackingMode = status.Contains("tracking") ? TrackingMode.EqN : TrackingMode.Off;
-            }
+                // Update positions
+                getPointingEq(out double ra, out double dec);
+                RightAscension = ra;
+                Declination = dec;
 
-            // Update Pier Side
-            string ret = CommandString("read mount", false); // Read mount position
-            string[] pos = ret.Split(' ');
-            if (pos.Length >= 2 && Double.TryParse(pos[1], out double decAxes)) // Mount dec pos
-            {
-                decAxes = Math.IEEERemainder(dec, 360.0);
-                if (decAxes >= 0)
+                using (var trans = new Astrometry.Transform.Transform()) using (var utilities = new Util())
                 {
-                    // Point to west half of sky
-                    pierSide = PierSide.pierEast;
+                    var jd = utilities.DateUTCToJulian(DateTime.UtcNow);
+                    trans.SiteLatitude = Latitude;
+                    trans.SiteLongitude = Longitude;
+                    trans.SiteElevation = Elevation;
+                    trans.SiteTemperature = temperature;
+                    trans.JulianDateUTC = jd;
+                    trans.SetJ2000(ra, dec);
+                    trans.Refraction = Refraction;
+                    trans.Refresh();
+                    Altitude = trans.ElevationTopocentric;
+                    Azimuth = trans.AzimuthTopocentric;
                 }
-                else
-                {
-                    // Point to east half of sky
-                    pierSide = PierSide.pierWest;
-                }
-            }
 
-            // Things that doesn't need to be updated so frequently
-            if (++count > 10)
-            {
-                count = 0;
-                lock (s_Profile)
+                pointingState = (SideOfPier == PierSide.pierEast) ? PointingState.Normal : PointingState.ThroughThePole;
+
+                // Update Rates
+                if (Double.TryParse(CommandString("speed slew", false), out double sr))
                 {
-                    // Update Lat/Long
-                    if (!Double.TryParse(CommandString("config latitude", false), out latitude))
+                    slewRate = sr;
+                }
+                if (Double.TryParse(CommandString("speed track", false), out double tr))
+                {
+                    trackRate = DriveRates.driveSidereal;
+                    if (Math.Abs(tr - 0.9763) <= 1e-4)
                     {
-                        LogMessage("Hardware.Latitude", "Get failed ");
+                        trackRate = DriveRates.driveLunar;
+                    }
+                    else if (Math.Abs(tr - 0.9973) <= 1e-4)
+                    {
+                        trackRate = DriveRates.driveSolar;
+                    }
+                    else if (Math.Abs(tr - 0.9998) <= 1e-4)
+                    {
+                        trackRate = DriveRates.driveKing;
+                    }
+                }
+                if (Double.TryParse(CommandString("speed guide", false), out double gr))
+                {
+                    guideRate = gr;
+                }
+
+                // Update status
+                string status = CommandString("status", false);
+                IsSlewing = status.Contains("slewing");
+                isPulseGuiding = status.Contains("guiding");
+                if (!IsSlewing)
+                {
+                    // TODO South semisphere support
+                    trackingMode = status.Contains("tracking") ? TrackingMode.EqN : TrackingMode.Off;
+                }
+
+                // Update Pier Side
+                string ret = CommandString("read mount", false); // Read mount position
+                string[] pos = ret.Split(' ');
+                if (pos.Length >= 2 && Double.TryParse(pos[1], out double decAxes)) // Mount dec pos
+                {
+                    decAxes = Math.IEEERemainder(dec, 360.0);
+                    if (decAxes >= 0)
+                    {
+                        // Point to west half of sky
+                        pierSide = PierSide.pierEast;
                     }
                     else
                     {
-                        s_Profile.WriteValue(SharedResources.PROGRAM_ID, "Latitude", latitude.ToString(CultureInfo.InvariantCulture));
-                    }
-                    if (!Double.TryParse(CommandString("config longitude", false), out longitude))
-                    {
-                        LogMessage("Hardware.Longitude", "Get failed ");
-                    }
-                    else
-                    {
-                        s_Profile.WriteValue(SharedResources.PROGRAM_ID, "Longitude", longitude.ToString(CultureInfo.InvariantCulture));
+                        // Point to east half of sky
+                        pierSide = PierSide.pierWest;
                     }
                 }
+
+                // Things that doesn't need to be updated so frequently
+                if (++count > 10)
+                {
+                    count = 0;
+                    lock (s_Profile)
+                    {
+                        // Update Lat/Long
+                        if (!Double.TryParse(CommandString("config latitude", false), out latitude))
+                        {
+                            LogMessage("Hardware.Latitude", "Get failed ");
+                        }
+                        else
+                        {
+                            s_Profile.WriteValue(SharedResources.PROGRAM_ID, "Latitude", latitude.ToString(CultureInfo.InvariantCulture));
+                        }
+                        if (!Double.TryParse(CommandString("config longitude", false), out longitude))
+                        {
+                            LogMessage("Hardware.Longitude", "Get failed ");
+                        }
+                        else
+                        {
+                            s_Profile.WriteValue(SharedResources.PROGRAM_ID, "Longitude", longitude.ToString(CultureInfo.InvariantCulture));
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: serial disconnected");
+                SharedResources.dropConnection();
             }
 
             //TL.LogMessage("Hardware.SideOfPier Get", pierSide.ToString());
@@ -2158,8 +2174,8 @@ namespace ASCOM.PushToGo
             PushToGo.m_MainForm.Azimuth(Azimuth);
             PushToGo.m_MainForm.RightAscension(RightAscension);
             PushToGo.m_MainForm.Declination(Declination);
-            PushToGo.m_MainForm.Tracking();
             PushToGo.m_MainForm.LedPier(SideOfPier);
+            PushToGo.m_MainForm.Tracking();
 
             PushToGo.m_MainForm.LabelState(PushToGo.m_MainForm.lblPARK, AtPark);
             PushToGo.m_MainForm.LabelState(PushToGo.m_MainForm.lblHOME, AtHome);

@@ -471,7 +471,8 @@ namespace ASCOM.PushToGo
 
         private void ButtonSlewStop_Click(object sender, EventArgs e)
         {
-            try { 
+            try
+            {
                 TelescopeHardware.AbortSlew();
             }
             catch (Exception ex)
@@ -485,7 +486,8 @@ namespace ASCOM.PushToGo
         {
             if (TelescopeHardware.Tracking == checkBoxTrack.Checked)
                 return;
-            try { 
+            try
+            {
                 TelescopeHardware.Tracking = checkBoxTrack.Checked;
             }
             catch (Exception ex)
@@ -496,40 +498,53 @@ namespace ASCOM.PushToGo
 
         public void Tracking()
         {
-            checkBoxTrack.Invoke((MethodInvoker)delegate
+            try
             {
-                if (TelescopeHardware.Tracking == checkBoxTrack.Checked)
-                    return;
-                // this avoids triggering the checked changed event
-                checkBoxTrack.CheckState = TelescopeHardware.Tracking ? CheckState.Checked : CheckState.Unchecked;
-            });
+                this.Invoke((MethodInvoker)delegate
+                {
+                    if (TelescopeHardware.Tracking == checkBoxTrack.Checked)
+                        return;
+                    // this avoids triggering the checked changed event
+                    checkBoxTrack.CheckState = TelescopeHardware.Tracking ? CheckState.Checked : CheckState.Unchecked;
+                });
+            }
+            catch { }
         }
 
         public void LedPier(ASCOM.DeviceInterface.PierSide sideOfPier)
         {
-            this.Invoke((MethodInvoker)delegate
+            try
             {
-                if (sideOfPier == ASCOM.DeviceInterface.PierSide.pierEast)
+                this.Invoke((MethodInvoker)delegate
                 {
-                    ledPierEast.Status = TrafficLight.Green;
-                    ledPierEast.Visible = true;
-                    ledPierWest.Visible = false;
-                }
-                else
-                {
-                    ledPierWest.Status = TrafficLight.Red;
-                    ledPierWest.Visible = true;
-                    ledPierEast.Visible = false;
-                }
-            });
+                    if (sideOfPier == ASCOM.DeviceInterface.PierSide.pierEast)
+                    {
+                        ledPierEast.Status = TrafficLight.Green;
+                        ledPierEast.Visible = true;
+                        ledPierWest.Visible = false;
+                    }
+                    else
+                    {
+                        ledPierWest.Status = TrafficLight.Red;
+                        ledPierWest.Visible = true;
+                        ledPierEast.Visible = false;
+                    }
+                });
+            }
+            catch
+            { }
         }
 
         public void LabelState(Label label, bool state)
         {
-            this.Invoke((MethodInvoker)delegate
+            try
             {
-                label.ForeColor = state ? Color.Red : Color.SaddleBrown;
-            });
+                this.Invoke((MethodInvoker)delegate
+                {
+                    label.ForeColor = state ? Color.Red : Color.SaddleBrown;
+                });
+            }
+            catch { }
         }
 
         private void ButtonPark_Click(object sender, EventArgs e)
@@ -540,17 +555,18 @@ namespace ASCOM.PushToGo
                 {
                     TelescopeHardware.AtPark = false;
                     TelescopeHardware.Tracking = true;
-                    if(!TelescopeHardware.AtPark)
+                    if (!TelescopeHardware.AtPark)
                         buttonPark.Text = "Park";
                 }
                 else
                 {
                     TelescopeHardware.AtPark = true;
                     TelescopeHardware.Tracking = false;
-                    if(TelescopeHardware.AtPark)
+                    if (TelescopeHardware.AtPark)
                         buttonPark.Text = "Unpark";
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.ToString(), MessageBoxButtons.OK);
             }
@@ -563,14 +579,21 @@ namespace ASCOM.PushToGo
                 if (SharedResources.Connected)
                 {
                     SharedResources.Connected = false;
-                    if(!SharedResources.Connected)
+                    if (!SharedResources.Connected)
                         buttonConnect.Text = "Connect";
                 }
                 else
                 {
-                    SharedResources.Connected = true;
-                    if (SharedResources.Connected)
-                        buttonConnect.Text = "Disconn";
+                    if (buttonConnect.Text == "Disconn")
+                    {
+                        // Reset in case of error
+                        buttonConnect.Text = "Connect";
+                    }
+                    else { 
+                        SharedResources.Connected = true;
+                        if (SharedResources.Connected)
+                            buttonConnect.Text = "Disconn";
+                    }
                 }
             }
             catch (Exception ex)

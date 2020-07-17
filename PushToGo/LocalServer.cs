@@ -343,12 +343,12 @@ namespace ASCOM.PushToGo
             try { Process p = Process.Start(si); }
             catch (System.ComponentModel.Win32Exception)
             {
-                MessageBox.Show("The Telescope Simulator was not " + (arg == "/register" ? "registered" : "unregistered") +
-                    " because you did not allow it.", "TelescopeSimulator", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("The PushToGo Driver was not " + (arg == "/register" ? "registered" : "unregistered") +
+                    " because you did not allow it.", "The PushToGo Driver", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString(), "TelescopeSimulator", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                MessageBox.Show(ex.ToString(), "The PushToGo Driver", MessageBoxButtons.OK, MessageBoxIcon.Stop);
             }
             return;
         }
@@ -410,7 +410,7 @@ namespace ASCOM.PushToGo
             catch (Exception ex)
             {
                 MessageBox.Show("Error while registering the server:\n" + ex.ToString(),
-                        "TelescopeSimulator", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                        "The PushToGo Driver", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return;
             }
             finally
@@ -481,7 +481,7 @@ namespace ASCOM.PushToGo
                 catch (Exception ex)
                 {
                     MessageBox.Show("Error while registering the server:\n" + ex.ToString(),
-                            "TelescopeSimulator", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                            "The PushToGo Driver", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                     bFail = true;
                 }
                 finally
@@ -629,7 +629,7 @@ namespace ASCOM.PushToGo
 
                     default:
                         MessageBox.Show("Unknown argument: " + args[0] + "\nValid are : -register, -unregister and -embedding",
-                            "TelescopeSimulator", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                            "The PushToGo Driver", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         break;
                 }
             }
@@ -686,7 +686,7 @@ namespace ASCOM.PushToGo
             }
             catch (Exception ex)
             {
-                var str = string.Format("Fatal error in the Simulator server: {0}", ex);
+                var str = string.Format("Fatal error in the PushToGo Driver server: {0}", ex);
                 MessageBox.Show(str);
                 throw;
             }

@@ -605,7 +605,6 @@ namespace ASCOM.PushToGo
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.Button buttonTraffic;
         private System.Windows.Forms.Button buttonSetup;
-        private System.Windows.Forms.Button buttonConnect;
         private System.Windows.Forms.Button buttonPark;
         internal System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         internal System.Windows.Forms.Label lblPARK;
@@ -621,8 +620,7 @@ namespace ASCOM.PushToGo
 		private System.Windows.Forms.RadioButton radioButtonPulseGuide;
 		private System.Windows.Forms.RadioButton radioButtonMoveAxis;
         private System.Windows.Forms.Label label6;
-
-
+        internal System.Windows.Forms.Button buttonConnect;
     }
 }
 

@@ -279,8 +279,8 @@ namespace ASCOM.PushToGo
         {
             if (!Connected)
             {
-                System.Windows.Forms.MessageBox.Show("Error: Serial port not connected.");
-                throw new ASCOM.NotConnectedException(str);
+                //System.Windows.Forms.MessageBox.Show("Error: Serial port not connected.");
+                throw new ASCOM.NotConnectedException("Error: not connected at " + str);
             }
         }
 
@@ -356,9 +356,11 @@ namespace ASCOM.PushToGo
                     }
                 } while (true);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                System.Windows.Forms.MessageBox.Show("Error: " + e.Message);
+                // Error happened, try disconnect the Serial
+                Console.WriteLine("Error: serial disconnected");
+                dropConnection();
             }
             finally
             {
@@ -431,6 +433,18 @@ namespace ASCOM.PushToGo
                 }
             }
             get { return SharedSerial.Connected; }
+        }
+
+        internal static void dropConnection()
+        {
+            try
+            {
+                s_sharedSerial.Connected = false;
+            }
+            catch { }
+            System.Windows.Forms.MessageBox.Show("Error: Serial connection lost");
+            s_z = 0;
+            PushToGo.m_MainForm.buttonConnect.Text = "Connect";
         }
 
         #endregion

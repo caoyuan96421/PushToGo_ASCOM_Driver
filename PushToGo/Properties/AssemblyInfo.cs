@@ -11,8 +11,9 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCopyright("Copyright © 2018, Yuan Cao")]
 
-[assembly: ComVisibleAttribute(false)]
+[assembly: ComVisible(false)]
 
 // AssemblyFileVersion is set globally (do not add an AssemblyFileVersion here).
 [assembly: AssemblyVersion("6.4.0.0")]
 [assembly: NeutralResourcesLanguageAttribute("en")]
+[assembly: AssemblyProduct("ASCOM PushToGo Driver")]
